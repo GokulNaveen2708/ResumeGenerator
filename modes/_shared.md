@@ -29,11 +29,11 @@ The evaluation uses 6 blocks (A-F) with a global score of 1-5:
 
 | Dimension | What it measures |
 |-----------|-----------------|
-| Match con CV | Skills, experience, proof points alignment |
-| North Star alignment | How well the role fits the user's target archetypes (from _profile.md) |
-| Comp | Salary vs market (5=top quartile, 1=well below) |
-| Cultural signals | Company culture, growth, stability, remote policy |
-| Red flags | Blockers, warnings (negative adjustments) |
+| Match con CV | Skills, experience, projects alignment |
+| Growth & Learning | Mentorship, engineering culture, tech stack growth, career trajectory |
+| Comp | Salary vs entry/mid market ($70K-160K range) |
+| Cultural signals | New grad program?, sponsorship?, remote policy, team size |
+| Red flags | "5+ years required" = hard blocker, "no sponsorship" = hard blocker |
 | **Global** | Weighted average of above |
 
 **Score interpretation:**
@@ -41,6 +41,12 @@ The evaluation uses 6 blocks (A-F) with a global score of 1-5:
 - 4.0-4.4 → Good match, worth applying
 - 3.5-3.9 → Decent but not ideal, apply only if specific reason
 - Below 3.5 → Recommend against applying (see Ethical Use in CLAUDE.md)
+
+**Auto score adjustments:**
+- **+0.5** if company has a formal new grad / early career program
+- **+0.3** if company is a known H-1B/OPT sponsor
+- **-1.0** if JD explicitly says "no sponsorship" or "must be authorized to work"
+- **-0.5** if JD requires 5+ years experience with no flexibility
 
 ## Posting Legitimacy (Block G)
 
@@ -76,12 +82,14 @@ Classify every offer into one of these types (or hybrid of 2):
 
 | Archetype | Key signals in JD |
 |-----------|-------------------|
-| AI Platform / LLMOps | "observability", "evals", "pipelines", "monitoring", "reliability" |
-| Agentic / Automation | "agent", "HITL", "orchestration", "workflow", "multi-agent" |
-| Technical AI PM | "PRD", "roadmap", "discovery", "stakeholder", "product manager" |
-| AI Solutions Architect | "architecture", "enterprise", "integration", "design", "systems" |
-| AI Forward Deployed | "client-facing", "deploy", "prototype", "fast delivery", "field" |
-| AI Transformation | "change management", "adoption", "enablement", "transformation" |
+| Software Engineer (General) | "software engineer", "SDE", "new grad", general backend/frontend/fullstack |
+| Backend / Distributed Systems | "backend", "distributed", "microservices", "APIs", "databases", "scalability" |
+| Full Stack Engineer | "full stack", "frontend", "backend", "React", "Node.js", "end-to-end" |
+| AI/ML Engineer | "machine learning", "AI", "LLM", "model", "training", "inference" |
+| Platform / Infrastructure | "platform", "infrastructure", "SRE", "DevOps", "cloud", "Kubernetes" |
+| Cloud / DevOps Engineer | "AWS", "GCP", "Azure", "CI/CD", "Terraform", "deployment" |
+| Data Engineer | "data pipeline", "ETL", "Spark", "data warehouse", "streaming" |
+| Forward Deployed Engineer | "client-facing", "deploy", "prototype", "field", "customer", "solutions" |
 
 After detecting archetype, read `modes/_profile.md` for the user's specific framing and proof points for that archetype.
 
@@ -159,3 +167,4 @@ These rules apply to ALL generated text that ends up in candidate-facing documen
 - "Cut p95 latency from 2.1s to 380ms" beats "improved performance"
 - "Postgres + pgvector for retrieval over 12k docs" beats "designed scalable RAG architecture"
 - Name tools, projects, and customers when allowed
+

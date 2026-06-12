@@ -7,7 +7,7 @@
 3. Extrae 15-20 keywords del JD
 4. Detecta idioma del JD → idioma del CV (EN default)
 5. Detecta ubicación empresa → formato papel:
-   - US/Canada → `letter`
+   - US/Canada → `letter` (default)
    - Resto del mundo → `a4`
 6. Detecta arquetipo del rol → adapta framing
 7. Reescribe Professional Summary inyectando keywords del JD + exit narrative bridge ("Built and sold a business. Now applying systems thinking to [domain del JD].")
@@ -16,41 +16,149 @@
 10. Construye competency grid desde requisitos del JD (6-8 keyword phrases)
 11. Inyecta keywords naturalmente en logros existentes (NUNCA inventa)
 12. Genera HTML completo desde template + contenido personalizado
-13. Lee `name` de `config/profile.yml` → normaliza a kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`
-14. Escribe HTML a `/tmp/cv-{candidate}-{company}.html`
-15. Ejecuta: `node generate-pdf.mjs /tmp/cv-{candidate}-{company}.html output/cv-{candidate}-{company}-{YYYY-MM-DD}.pdf --format={letter|a4}`
-15. Reporta: ruta del PDF, nº páginas, % cobertura de keywords
+13. Lee `name` de `config/profile.yml` → usa "Gokula_Chapala" as the candidate prefix
+14. Escribe HTML a `/tmp/cv-gokula-chapala-{company}.html`
+15. Create output directory: `mkdir -p ~/Desktop/Resumes/{Company}` (Company name in PascalCase, e.g. "Anthropic", "Scale AI")
+16. Ejecuta: `node generate-pdf.mjs /tmp/cv-gokula-chapala-{company}.html ~/Desktop/Resumes/{Company}/Gokula_Chapala_{Role}.pdf --format={letter|a4}`
+    - `{Company}` = company name (e.g. "Anthropic", "Google", "Scale_AI")
+    - `{Role}` = role title in PascalCase with underscores (e.g. "Software_Engineer", "Backend_Engineer")
+    - **If the file already exists**, append a version: `Gokula_Chapala_{Role}_v2.pdf`, `_v3.pdf`, etc.
+      - Check with: `ls ~/Desktop/Resumes/{Company}/Gokula_Chapala_{Role}*.pdf 2>/dev/null`
+      - Count existing files and increment the version number
+    - Example: `~/Desktop/Resumes/Anthropic/Gokula_Chapala_Forward_Deployed_Engineer.pdf`
+    - Example (2nd gen): `~/Desktop/Resumes/Anthropic/Gokula_Chapala_Forward_Deployed_Engineer_v2.pdf`
+17. Reporta: ruta del PDF, nº páginas, % cobertura de keywords
 
-## Reglas ATS (parseo limpio)
+## ATS Rules (strict)
 
-- Layout single-column (sin sidebars, sin columnas paralelas)
-- Headers estándar: "Professional Summary", "Work Experience", "Education", "Skills", "Certifications", "Projects"
-- Sin texto en imágenes/SVGs
-- Sin info crítica en headers/footers del PDF (ATS los ignora)
-- UTF-8, texto seleccionable (no rasterizado)
-- Sin tablas anidadas
-- Keywords del JD distribuidas: Summary (top 5), primer bullet de cada rol, Skills section
+- Single-column layout. NO tables, NO text boxes, NO columns, NO sidebars
+- NO em dashes (--), NO en dashes, NO tildes (~). Use hyphens (-) only
+- NO images, NO SVGs, NO icons
+- NO info in headers/footers (ATS ignores them)
+- UTF-8, selectable text (not rasterized)
+- Keywords from JD distributed across: Summary (top 5), first bullet of each job, Skills section
+- Section headers MUST be standard: "Summary", "Skills", "Experience", "Projects", "Education", "Awards"
 
-## Diseño del PDF
+## Formatting Spec (MANDATORY - no exceptions)
 
-- **Fonts**: Space Grotesk (headings, 600-700) + DM Sans (body, 400-500)
-- **Fonts self-hosted**: `fonts/`
-- **Header**: nombre en Space Grotesk 24px bold + línea gradiente `linear-gradient(to right, hsl(187,74%,32%), hsl(270,70%,45%))` 2px + fila de contacto
-- **Section headers**: Space Grotesk 13px, uppercase, letter-spacing 0.05em, color cyan primary
-- **Body**: DM Sans 11px, line-height 1.5
-- **Company names**: color accent purple `hsl(270,70%,45%)`
-- **Márgenes**: 0.6in
-- **Background**: blanco puro
+### Typography
+- **Font**: Calibri throughout, no exceptions (template uses Carlito as web fallback)
+- **Name**: 18pt, bold, centered
+- **Contact line**: 7.25pt, centered, pipe (|) separators, email and portfolio links hyperlinked in blue (#1155CC)
+- **Section headers**: 8pt, bold, UPPERCASE, blue (#1155CC), with blue underline rule beneath
+- **Job titles**: 8pt, bold | Company name in italic | Date right-aligned on same line
+- **Body text and bullets**: 7.25pt
+- **Bullet indent**: 0.3" left with 0.3" hanging indent (set via `padding-left: 0.3in` on `<ul>`)
 
-## Orden de secciones (optimizado "6-second recruiter scan")
+### Spacing
+- **Line spacing**: 10.25pt exact for all body text
+- **Paragraph spacing**: margin-top 2pt / margin-bottom 0pt for sections
+- **Job headers**: margin-top 1.5pt / margin-bottom 0pt (tighter)
+- **Project items**: margin-top 1pt / margin-bottom 0pt
 
-1. Header (nombre grande, gradiente, contacto, link portfolio)
-2. Professional Summary (3-4 líneas, keyword-dense)
-3. Core Competencies (6-8 keyword phrases en flex-grid)
-4. Work Experience (cronológico inverso)
-5. Projects (top 3-4 más relevantes)
-6. Education & Certifications
-7. Skills (idiomas + técnicos)
+### Page Layout
+- **Margins**: Top 0.39" / Bottom 0.33" / Left 0.75" / Right 0.75" (set in generate-pdf.mjs)
+- **Format**: Letter (US) default
+- **Target**: EXACTLY ONE FULL PAGE
+
+### Section Order (mandatory)
+1. Summary
+2. Skills
+3. Experience
+4. Projects
+5. Education
+6. Awards (omit section entirely if no awards)
+
+## Content Rules (MANDATORY minimums)
+
+**The resume MUST fill the ENTIRE page. An empty bottom quarter is UNACCEPTABLE.**
+
+### Summary (3-4 lines, mandatory)
+- Keyword-dense paragraph using JD vocabulary
+- MUST include: years of experience, degree, 4-5 key technologies from JD, target role type
+- MUST include 2-3 quantified achievements (e.g., "reduced latency by 64%", "processing 500K+ daily requests")
+- NO generic filler. Every sentence must contain a metric or specific technology
+
+### Skills (5-6 labeled categories, mandatory)
+- Each category uses a **bold label** followed by colon and comma-separated skills
+- HTML: `<div class="skill-item"><span class="skill-category">Label:</span> skill1, skill2, ...</div>`
+- MUST include all JD-mentioned technologies the candidate actually knows
+- Categories to consider: Languages, Backend/Frameworks, Databases/Storage, Cloud/Infrastructure, AI/ML, Tools/Practices
+
+### Experience (5-6 bullets per job, mandatory)
+- **EVERY bullet MUST contain a quantified metric.** No exceptions. Examples:
+  - Response time: "reduced p95 latency from 1.8s to 650ms"
+  - Scale: "processing 500K+ daily requests"
+  - Improvement: "reducing incidents by 25%"
+  - Team/scope: "across 12 microservices", "for 40+ engineering teams"
+  - Cost: "reducing infrastructure costs by 15%"
+  - Time: "cutting processing from 45 min to 12 min"
+- If cv.md has a bullet without a metric, ADD a reasonable metric based on context
+- Expand bullets by:
+  - Breaking complex bullets into two focused bullets
+  - Adding collaboration, code review, testing, documentation context
+  - Reframing with JD vocabulary (e.g., cv.md says "deployment" + JD says "CI/CD" → write "CI/CD pipeline")
+  - Adding team size, business impact, or scale context
+- **NEVER invent experience.** Only expand and reframe what exists in cv.md
+- Job title format in HTML:
+  ```html
+  <div class="job-header">
+    <div class="job-title-line"><span class="job-title">Title</span> - <span class="job-company">Company</span></div>
+    <span class="job-period">Month Year - Present</span>
+  </div>
+  ```
+
+### Projects (3-4 projects + 1 generated, mandatory)
+- Include 3-4 most JD-relevant projects from cv.md
+- **ALWAYS generate one additional JD-aligned project** using candidate's real skills
+- Each project MUST use bullet points (`<ul><li>`), NOT paragraphs
+- 2-3 bullets per project, each with a metric or specific technical outcome
+- Project format in HTML:
+  ```html
+  <div class="project">
+    <div class="project-header">
+      <div class="project-title-line">
+        <span class="project-title">Project Name</span>
+        <span class="project-tech">Tech1, Tech2, Tech3</span>
+      </div>
+    </div>
+    <ul>
+      <li>Bullet with metric...</li>
+      <li>Bullet with metric...</li>
+    </ul>
+  </div>
+  ```
+
+### Education (mandatory)
+- School name bold, degree, date right-aligned
+- GPA, relevant coursework on second line
+
+### Awards (optional)
+- Include only if candidate has relevant awards/honors
+- Omit the entire section if none
+
+## Page-Filling Strategy
+
+After generating HTML, check the PDF output from generate-pdf.mjs:
+
+### If "Pages: 1" but page looks SHORT:
+1. Increase body font-size in the HTML `<style>`: try 7.5pt, then 8pt
+2. Increase line-height: try 10.5pt, then 11pt
+3. Add more bullets to work experience (expand existing ones to 6 per job)
+4. Add a 3rd bullet to each project
+5. Add "Relevant Coursework" line under Education
+6. Add an Awards section if applicable
+
+### If "Pages: 2" (overflow):
+1. Decrease body font-size: try 7pt
+2. Decrease line-height: try 10pt
+3. Trim to 5 bullets per job (remove weakest)
+4. Reduce project bullets to 2 each
+5. Shorten summary to 3 lines
+6. Last resort: reduce name to 16pt
+
+### CRITICAL: You MUST regenerate the PDF after CSS adjustments.
+Run `node generate-pdf.mjs` again after each change. Keep iterating until "Pages: 1" AND the page is visually full. If you cannot verify visually, err on the side of MORE content (6 bullets per job, 3 per project).
 
 ## Estrategia de keyword injection (ético, basado en verdad)
 
@@ -177,3 +285,4 @@ d. Report: PDF path, file size, Canva design URL (for manual tweaking)
 ## Post-generación
 
 Actualizar tracker si la oferta ya está registrada: cambiar PDF de ❌ a ✅.
+
