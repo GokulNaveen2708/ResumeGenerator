@@ -78,7 +78,7 @@ async function generatePDF() {
   const args = process.argv.slice(2);
 
   // Parse arguments
-  let inputPath, outputPath, format = 'a4';
+  let inputPath, outputPath, format = 'letter';
 
   for (const arg of args) {
     if (arg.startsWith('--format=')) {
@@ -151,10 +151,10 @@ async function generatePDF() {
       format: format,
       printBackground: true,
       margin: {
-        top: '0.6in',
-        right: '0.6in',
-        bottom: '0.6in',
-        left: '0.6in',
+        top: '0.39in',
+        right: '0.75in',
+        bottom: '0.33in',
+        left: '0.75in',
       },
       preferCSSPageSize: false,
     });
