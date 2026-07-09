@@ -187,7 +187,7 @@ Skills serve two masters: ATS keyword matching (machine) and credibility check (
 
 ### Experience (EXACTLY 15 bullets total: 6 + 6 + 3, mandatory)
 
-Distribute across top 3 jobs: 6 bullets for most recent, 6 for second, 3 for third.
+Distribute across top 3 jobs by IMPORTANCE, not recency. See `_profile.md` for the explicit job priority and display order. Do NOT assume chronological order.
 
 #### The Narrative Bullet Formula
 
